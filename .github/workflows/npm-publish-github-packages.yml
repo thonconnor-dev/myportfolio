@@ -4,8 +4,9 @@
 name: Deploy to GitHub Pages
 
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - master
 
 jobs:
   deploy:
@@ -19,7 +20,13 @@ jobs:
           node-version: 20
       - run: git config user.name "github-actions[bot]"
       - run: git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Configure authenticated remote
+        run: git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
       - run: npm ci
       - run: npm run deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
